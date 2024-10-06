@@ -6,7 +6,7 @@ import axios from "axios";
 
 const AddNewAdmin = () => {
   const { isAuthenticated, setIsAuthenticated } = useContext(Context);
-  const yy = "http://localhost:4000";
+  const yy = "https://backend1-96bk.onrender.com";
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");

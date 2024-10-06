@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 const EditCompany = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const yy = "http://localhost:4000";
+  const yy = "https://backend1-96bk.onrender.com";
 
   const [formData, setFormData] = useState({
     jobTitle: "",

@@ -1,5 +1,5 @@
 const urls = {
-  url: "http://localhost:4000",
+  url: "https://backend1-96bk.onrender.com",
 };
 
 export { urls };

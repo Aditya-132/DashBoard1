@@ -16,7 +16,7 @@ import Papa from "papaparse";
 Modal.setAppElement("#root");
 
 const Dashboard = () => {
-  const yy = "http://localhost:4000";
+  const yy = "https://backend1-96bk.onrender.com";
   const [jobApplications, setJobApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
