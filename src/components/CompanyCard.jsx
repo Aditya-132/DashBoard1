@@ -1,5 +1,5 @@
-// CompanyCard.js
 import React from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const CompanyCard = ({ company, onDelete, onEdit }) => {
   const {
@@ -20,6 +20,13 @@ const CompanyCard = ({ company, onDelete, onEdit }) => {
 
   const postedDate = new Date(createdAt).toLocaleDateString();
   const deadlineDate = new Date(applicationDeadline).toLocaleDateString();
+
+  const navigate = useNavigate(); // Initialize navigate
+
+  // Function to handle the 'Explore' button click
+  const handleExploreClick = () => {
+    navigate(`/company-details/${_id}`); // Navigate to company details page
+  };
 
   return (
     <div className="max-w-sm w-full lg:max-w-full lg:flex my-4">
@@ -51,15 +58,13 @@ const CompanyCard = ({ company, onDelete, onEdit }) => {
         </div>
         <div className="flex justify-between items-center mt-4">
           <div className="text-gray-600">Posted on: {postedDate}</div>
-          {/* Explore button opens the details in a new tab */}
-          <a
-            href={`/company-details/${_id}`}
-            target="_blank"
-            rel="noopener noreferrer"
+          {/* Replace hyperlink with a button that uses navigate */}
+          <button
+            onClick={handleExploreClick}
             className="bg-green-500 text-white font-bold py-2 px-4 rounded hover:bg-green-600"
           >
             Explore
-          </a>
+          </button>
         </div>
       </div>
     </div>
