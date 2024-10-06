@@ -15,7 +15,7 @@ const Sidebar = () => {
   const [show, setShow] = useState(false);
 
   const { isAuthenticated, setIsAuthenticated } = useContext(Context);
-  const yy = "https://backend1-96bk.onrender.com";
+  const yy = "http://localhost:4000";
 
   const handleLogout = async () => {
     await axios

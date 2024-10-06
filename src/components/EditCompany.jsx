@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 const EditCompany = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const yy = "https://backend1-96bk.onrender.com";
+  const yy = "http://localhost:4000";
 
   const [formData, setFormData] = useState({
     jobTitle: "",
@@ -70,7 +70,7 @@ const EditCompany = () => {
     };
 
     fetchJobDetails();
-  }, [id, baseURL, navigate]);
+  }, [id, yy, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -122,7 +122,7 @@ const EditCompany = () => {
 
     try {
       const response = await axios.put(
-        `${baseURL}/api/v1/company/update/${id}`,
+        `${yy}/api/v1/company/update/${id}`,
         payload,
         {
           withCredentials: true,
