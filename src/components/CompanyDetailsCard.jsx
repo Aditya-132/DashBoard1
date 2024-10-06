@@ -7,7 +7,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 const CompanyDetailsCard = () => {
-  const { id } = useParams(); // Extract the company ID from the URL
+  const { id } = useParams();
+  console.log(id);// Extract the company ID from the URL
   const navigate = useNavigate();
   const [company, setCompany] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -21,9 +22,9 @@ const CompanyDetailsCard = () => {
       try {
         const response = await axios.get(
           `${yy}/api/v1/company/get/${id}`,
-          {
-            withCredentials: true,
-          }
+          // {
+          //   withCredentials: true,
+          // }
         );
         setCompany(response.data.company || response.data.job || response.data);
       } catch (error) {
