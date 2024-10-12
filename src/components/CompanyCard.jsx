@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
+import '../App.css'
 
 const CompanyCard = ({ company, onDelete, onEdit }) => {
   const {
@@ -29,7 +30,7 @@ const CompanyCard = ({ company, onDelete, onEdit }) => {
   };
 
   return (
-    <div className="max-w-sm w-full lg:max-w-full lg:flex my-4">
+    <div className="Company-cards max-w-sm w-full lg:max-w-full lg:flex my-4">
       <div className="border border-gray-400 bg-white rounded p-4 flex flex-col justify-between leading-normal shadow-md w-full">
         <div className="mb-8">
           <div className="text-gray-900 font-bold text-xl mb-2">
