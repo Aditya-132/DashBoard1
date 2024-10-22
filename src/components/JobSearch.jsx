@@ -106,8 +106,8 @@ const JobSearch = () => {
 
   return (
     <section className="dashboard page ml-10">
-      <div className="overflow-hidden Company_container mb-3 p-10">
-        <h1 className="overflow-hidden text-4xl margin-auto font-bold text-white">Companies</h1>
+      <div className="Company_container mb-3 p-10">
+        <h1 className="text-4xl font-bold">Companies</h1>
       </div>
       <SearchBar />
       <div className="pt-8">

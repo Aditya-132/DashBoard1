@@ -10,11 +10,9 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { Context } from "../main";
 import { useNavigate } from "react-router-dom";
-import './Sidebar.css';
 
 const Sidebar = () => {
   const [show, setShow] = useState(false);
-  const [selectedIcon, setSelectedIcon] = useState(null); // To track the selected icon
 
   const { isAuthenticated, setIsAuthenticated } = useContext(Context);
   const yy = "https://backend1-96bk.onrender.com";
@@ -38,24 +36,16 @@ const Sidebar = () => {
   const gotoHomePage = () => {
     navigateTo("/");
     setShow(!show);
-    setSelectedIcon('home'); // Set the selected icon
   };
 
   const gotoAddNewAdmin = () => {
     navigateTo("/admin/addnew");
     setShow(!show);
-    setSelectedIcon('addAdmin'); // Set the selected icon
   };
 
   const gotoJobSearch = () => {
     navigateTo("/admin/jobsearch");
     setShow(!show);
-    setSelectedIcon('jobSearch'); // Set the selected icon
-  };
-
-  const handleLogoutClick = () => {
-    handleLogout();
-    setSelectedIcon('logout'); // Set the selected icon
   };
 
   return (
@@ -65,46 +55,13 @@ const Sidebar = () => {
         className={show ? "show sidebar" : "sidebar"}
       >
         <div className="links">
-          <TiHome 
-            onClick={gotoHomePage}
-            style={{
-              backgroundColor: selectedIcon === 'home' ? 'white' : 'transparent',
-              color: selectedIcon === 'home' ? '#03346E' : 'inherit',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              transition: '0.3s'
-            }}
-          />
-          <MdAddModerator 
-            onClick={gotoAddNewAdmin}
-            style={{
-              backgroundColor: selectedIcon === 'addAdmin' ? 'white' : 'transparent',
-              color: selectedIcon === 'addAdmin' ? '#03346E' : 'inherit',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              transition: '0.3s'
-            }}
-          />
-          <FaPersonChalkboard 
-            onClick={gotoJobSearch}
-            style={{
-              backgroundColor: selectedIcon === 'jobSearch' ? 'white' : 'transparent',
-              color: selectedIcon === 'jobSearch' ? '#03346E' : 'inherit',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              transition: '0.3s'
-            }}
-          />
-          <RiLogoutBoxFill 
-            onClick={handleLogoutClick}
-            style={{
-              backgroundColor: selectedIcon === 'logout' ? 'white' : 'transparent',
-              color: selectedIcon === 'logout' ? '#03346E' : 'inherit',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              transition: '0.3s'
-            }}
-          />
+          {/* <TiHome onClick={gotoHomePage} /> */}
+          {/* <FaUserDoctor onClick={gotoDoctorsPage} /> */}
+          <MdAddModerator onClick={gotoAddNewAdmin} />
+
+          {/* <AiFillMessage onClick={gotoMessagesPage} /> */}
+          <FaPersonChalkboard onClick={gotoJobSearch} />
+          <RiLogoutBoxFill onClick={handleLogout} />
         </div>
       </nav>
       <div
