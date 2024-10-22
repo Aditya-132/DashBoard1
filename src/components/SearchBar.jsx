@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { FaMagnifyingGlass } from "react-icons/fa6";
-import './AddNewAdmin'
 
 const SearchBar = ({ value, onChange, handleSearch, onClearSearch }) => {
   const handleKeyPress = (event) => {
@@ -10,11 +9,11 @@ const SearchBar = ({ value, onChange, handleSearch, onClearSearch }) => {
     }
   };
   return (
-    <div className="w-90 h-28 overflow-hidden flex items-center px-4 bg-slate-100 rounded-full  h-24">
+    <div className="w-90 flex items-center px-4 bg-slate-100 rounded-full  h-24">
       <input
         type="text"
         placeholder="Search Notes"
-        className="w-full text-lg bg-transparent py-[11px] outline-none "
+        className="w-full text-xs bg-transparent py-[11px] outline-none"
         value={value}
         onChange={onChange}
         onKeyDown={handleKeyPress} // Call the function on key press
@@ -26,7 +25,7 @@ const SearchBar = ({ value, onChange, handleSearch, onClearSearch }) => {
           onClick={onClearSearch}
         />
       )}
-      <button className="bg-white" onClick={handleSearch} aria-label="Search">
+      <button onClick={handleSearch} aria-label="Search">
         <FaMagnifyingGlass />
       </button>
     </div>

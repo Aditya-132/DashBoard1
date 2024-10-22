@@ -247,7 +247,7 @@ const Dashboard = () => {
                   </button>
                 </div>
               </div>
-              <div className="banner p-10">
+              <div className="banner">
                 <h5>Student Applications</h5>
                 <div className="table-container">
                   <table className="styled-table">
