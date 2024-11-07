@@ -1,18 +1,13 @@
-// components/Dashboard.js
-
 import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../main";
 import { Navigate, Link, Route, Routes, useLocation } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { GoCheckCircleFill } from "react-icons/go";
-import { AiFillCloseCircle } from "react-icons/ai";
+import { FaEye, FaDownload, FaEnvelope, FaFilter } from "react-icons/fa";
 import Modal from "react-modal";
 import JobApplicationDetail from "./JobApplicationDetail";
-import "./Dashboard.css";
 import Papa from "papaparse";
 
-// Setting the app element for accessibility
 Modal.setAppElement("#root");
 
 const Dashboard = () => {
@@ -22,36 +17,31 @@ const Dashboard = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [proofUrl, setProofUrl] = useState("");
   const [filters, setFilters] = useState({
+    fullName: "",
+    reg: "",
     cgpa: "",
     hsc: "",
     ssc: "",
-    gap_year: "",
     branch: "",
+    status: "",
+    placed: "",
+    amount: "",
   });
-
-  // State variables for the email modal
   const [emailModalIsOpen, setEmailModalIsOpen] = useState(false);
   const [emailSubject, setEmailSubject] = useState("");
   const [emailContent, setEmailContent] = useState("");
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
 
   const location = useLocation();
+  const { isAuthenticated } = useContext(Context);
 
   useEffect(() => {
-    // Read query parameters and set filters accordingly
     const params = new URLSearchParams(location.search);
-    const cgpa = params.get("cgpa") || "";
-    const hsc = params.get("hsc") || "";
-    const ssc = params.get("ssc") || "";
-    const gap_year = params.get("gap_year") || "";
-    const branch = params.get("branch") || "";
-
-    setFilters({
-      cgpa,
-      hsc,
-      ssc,
-      gap_year,
-      branch,
+    const newFilters = {};
+    Object.keys(filters).forEach(key => {
+      newFilters[key] = params.get(key) || "";
     });
+    setFilters(newFilters);
   }, [location.search]);
 
   useEffect(() => {
@@ -78,20 +68,11 @@ const Dashboard = () => {
         { [field]: value },
         { withCredentials: true }
       );
-      setJobApplications((prevJobApplications) =>
-        prevJobApplications.map((jobApplication) =>
-          jobApplication._id === jobApplicationId
-            ? { ...jobApplication, [field]: value }
-            : jobApplication
-        )
+      const updatedApplications = jobApplications.map((app) =>
+        app._id === jobApplicationId ? { ...app, [field]: value } : app
       );
-      setFilteredApplications((prevFilteredApplications) =>
-        prevFilteredApplications.map((jobApplication) =>
-          jobApplication._id === jobApplicationId
-            ? { ...jobApplication, [field]: value }
-            : jobApplication
-        )
-      );
+      setJobApplications(updatedApplications);
+      setFilteredApplications(updatedApplications);
       toast.success(data.message);
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to update status.");
@@ -108,57 +89,41 @@ const Dashboard = () => {
     setProofUrl("");
   };
 
-  const handleInputChange = (jobApplicationId, field, value) => {
-    setJobApplications((prevJobApplications) =>
-      prevJobApplications.map((jobApplication) =>
-        jobApplication._id === jobApplicationId
-          ? { ...jobApplication, [field]: value }
-          : jobApplication
-      )
-    );
-  };
-
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prevFilters) => ({ ...prevFilters, [name]: value }));
   };
 
   useEffect(() => {
-    const filtered = jobApplications.filter((application) => {
-      return (
-        (filters.cgpa === "" || application.cgpa >= parseFloat(filters.cgpa)) &&
-        (filters.hsc === "" || application.hsc >= parseFloat(filters.hsc)) &&
-        (filters.ssc === "" || application.ssc >= parseFloat(filters.ssc)) &&
-        (filters.gap_year === "" ||
-          (application.gap_year &&
-            application.gap_year <= parseInt(filters.gap_year))) &&
-        (filters.branch === "" || application.branch === filters.branch)
-      );
+    const filtered = jobApplications.filter((app) => {
+      return Object.entries(filters).every(([key, value]) => {
+        if (value === "") return true;
+        if (["cgpa", "hsc", "ssc", "amount"].includes(key)) {
+          return app[key] >= parseFloat(value);
+        }
+        if (key === "fullName" || key === "reg" || key === "branch") {
+          return app[key].toLowerCase().includes(value.toLowerCase());
+        }
+        return app[key] === value;
+      });
     });
     setFilteredApplications(filtered);
   }, [filters, jobApplications]);
 
-  const { isAuthenticated, admin } = useContext(Context);
-  if (!isAuthenticated) {
-    return <Navigate to={"/login"} />;
-  }
-
   const handleDownloadCSV = () => {
-    const csvData = filteredApplications.map((application) => ({
-      "Full Name": application.fullName,
-      "Registration Number": application.reg,
-      CGPA: application.cgpa,
-      "HSC Marks": application.hsc,
-      "SSC Marks": application.ssc,
-      Department: application.branch,
-      Status: application.status,
-      Placed: application.placed,
-      Package: application.amount,
-      Email: application.email,
+    const csvData = filteredApplications.map((app) => ({
+      "Full Name": app.fullName,
+      "Registration Number": app.reg,
+      CGPA: app.cgpa,
+      "HSC Marks": app.hsc,
+      "SSC Marks": app.ssc,
+      Department: app.branch,
+      Status: app.status,
+      Placed: app.placed,
+      Package: app.amount,
+      Email: app.email,
     }));
-
     const csv = Papa.unparse(csvData);
-
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -171,10 +136,7 @@ const Dashboard = () => {
   };
 
   const handleSendEmails = async () => {
-    const emailAddresses = filteredApplications.map(
-      (application) => application.email
-    );
-
+    const emailAddresses = filteredApplications.map((app) => app.email);
     try {
       const { data } = await axios.post(
         `${yy}/api/v1/sendEmail`,
@@ -192,231 +154,229 @@ const Dashboard = () => {
     }
   };
 
+  const handleSort = (key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const sortedApplications = React.useMemo(() => {
+    let sortableItems = [...filteredApplications];
+    if (sortConfig.key !== null) {
+      sortableItems.sort((a, b) => {
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+          return sortConfig.direction === 'ascending' ? -1 : 1;
+        }
+        if (a[sortConfig.key] > b[sortConfig.key]) {
+          return sortConfig.direction === 'ascending' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return sortableItems;
+  }, [filteredApplications, sortConfig]);
+
+  if (!isAuthenticated) {
+    return <Navigate to={"/login"} />;
+  }
+
   return (
-    <>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <section className="dashboard page">
-              <div className="filter-section">
-                <h5>Filter Student Applications</h5>
-                <div className="filters">
-                  <input
-                    type="number"
-                    name="cgpa"
-                    placeholder="Min CGPA"
-                    value={filters.cgpa}
-                    onChange={handleFilterChange}
-                  />
-                  <input
-                    type="number"
-                    name="hsc"
-                    placeholder="Min HSC Marks"
-                    value={filters.hsc}
-                    onChange={handleFilterChange}
-                  />
-                  <input
-                    type="number"
-                    name="ssc"
-                    placeholder="Min SSC Marks"
-                    value={filters.ssc}
-                    onChange={handleFilterChange}
-                  />
-                  <input
-                    type="number"
-                    name="gap_year"
-                    placeholder="Max Gap Year"
-                    value={filters.gap_year}
-                    onChange={handleFilterChange}
-                  />
-                  <input
-                    name="branch"
-                    placeholder="Branch"
-                    value={filters.branch}
-                    onChange={handleFilterChange}
-                  />
-                  <button className="csv-button" onClick={handleDownloadCSV}>
-                    Download CSV
-                  </button>
-                  <button
-                    className="csv-button"
-                    onClick={() => setEmailModalIsOpen(true)}
-                  >
-                    Send Emails
-                  </button>
-                </div>
+    <div className="min-h-screen bg-gray-100 p-4">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-3xl font-bold mb-6">Student Applications Dashboard</h1>
+        <div className="bg-white shadow-md rounded-lg p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4">Filter Applications</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {Object.entries(filters).map(([key, value]) => (
+              <div key={key}>
+                <label htmlFor={key} className="block text-sm font-medium text-gray-700 mb-1">
+                  {key.charAt(0).toUpperCase() + key.slice(1)}
+                </label>
+                <input
+                  type={["cgpa", "hsc", "ssc", "amount"].includes(key) ? "number" : "text"}
+                  id={key}
+                  name={key}
+                  value={value}
+                  onChange={handleFilterChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder={`Filter by ${key}`}
+                />
               </div>
-              <div className="banner">
-                <h5>Student Applications</h5>
-                <div className="table-container">
-                  <table className="styled-table">
-                    <thead>
-                      <tr>
-                        <th>Full Name</th>
-                        <th>Registration Number</th>
-                        <th>CGPA</th>
-                        <th>HSC Marks</th>
-                        <th>SSC Marks</th>
-                        <th>Department</th>
-                        <th>Status</th>
-                        <th>Placed</th>
-                        <th>Package</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredApplications.length > 0 ? (
-                        filteredApplications.map((application) => (
-                          <tr key={application._id}>
-                            <td>{application.fullName}</td>
-                            <td>
-                              <Link to={`/job-application/${application.reg}`}>
-                                {application.reg}
-                              </Link>
-                            </td>
-                            <td>{application.cgpa}</td>
-                            <td>{application.hsc}</td>
-                            <td>{application.ssc}</td>
-                            <td>{application.branch}</td>
-                            <td>
-                              <select
-                                className={
-                                  application.status === "Pending"
-                                    ? "value-pending"
-                                    : application.status === "Accepted"
-                                    ? "value-accepted"
-                                    : "value-rejected"
-                                }
-                                value={application.status}
-                                onChange={(e) =>
-                                  handleUpdateStatus(
-                                    application._id,
-                                    "status",
-                                    e.target.value
-                                  )
-                                }
-                              >
-                                <option
-                                  value="Pending"
-                                  className="value-pending"
-                                >
-                                  Pending
-                                </option>
-                                <option
-                                  value="Accepted"
-                                  className="value-accepted"
-                                >
-                                  Accepted
-                                </option>
-                                <option
-                                  value="Rejected"
-                                  className="value-rejected"
-                                >
-                                  Rejected
-                                </option>
-                              </select>
-                            </td>
-                            <td>
-                              <select
-                                value={application.placed}
-                                onChange={(e) =>
-                                  handleUpdateStatus(
-                                    application._id,
-                                    "placed",
-                                    e.target.value
-                                  )
-                                }
-                              >
-                                <option value="Placed">Placed</option>
-                                <option value="Rejected">Rejected</option>
-                              </select>
-                            </td>
-                            <td>
-                              <input
-                                type="number"
-                                value={application.amount || ""}
-                                placeholder="Package"
-                                onChange={(e) =>
-                                  handleUpdateStatus(
-                                    application._id,
-                                    "amount",
-                                    e.target.value
-                                  )
-                                }
-                              />
-                            </td>
-                            <td>
-                              <button
-                                className="button"
-                                onClick={() => openModal(application.proof.url)}
-                              >
-                                View Proof
-                              </button>
-                            </td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan="10" className="no-applications">
-                            No job applications found.
-                          </td>
-                        </tr>
+            ))}
+          </div>
+        </div>
+        <div className="bg-white shadow-md rounded-lg overflow-hidden">
+          <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+            <h2 className="text-xl font-semibold">Application List</h2>
+            <div className="space-x-2">
+              <button
+                onClick={handleDownloadCSV}
+                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition duration-200"
+              >
+                <FaDownload className="inline-block mr-2" />
+                Download CSV
+              </button>
+              <button
+                onClick={() => setEmailModalIsOpen(true)}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200"
+              >
+                <FaEnvelope className="inline-block mr-2" />
+                Send Emails
+              </button>
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  {Object.keys(filters).map((key) => (
+                    <th
+                      key={key}
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                      onClick={() => handleSort(key)}
+                    >
+                      {key.charAt(0).toUpperCase() + key.slice(1)}
+                      {sortConfig.key === key && (
+                        <span>{sortConfig.direction === 'ascending' ? ' ▲' : ' ▼'}</span>
                       )}
-                    </tbody>
-                  </table>
-                </div>
+                    </th>
+                  ))}
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {sortedApplications.map((app) => (
+                  <tr key={app._id}>
+                    {Object.entries(filters).map(([key, _]) => (
+                      <td key={key} className="px-6 py-4 whitespace-nowrap">
+                        {key === "reg" ? (
+                          <Link to={`/job-application/${app.reg}`} className="text-blue-600 hover:underline">
+                            {app[key]}
+                          </Link>
+                        ) : key === "status" || key === "placed" ? (
+                          <select
+                            value={app[key]}
+                            onChange={(e) => handleUpdateStatus(app._id, key, e.target.value)}
+                            className={`px-2 py-1 rounded ${
+                              app[key] === "Pending" ? "bg-yellow-100 text-yellow-800" :
+                              app[key] === "Accepted" || app[key] === "Placed" ? "bg-green-100 text-green-800" :
+                              "bg-red-100 text-red-800"
+                            }`}
+                          >
+                            {key === "status" ? (
+                              <>
+                                <option value="Pending">Pending</option>
+                                <option value="Accepted">Accepted</option>
+                                <option value="Rejected">Rejected</option>
+                              </>
+                            ) : (
+                              <>
+                                <option value="Not Placed">Not Placed</option>
+                                <option value="Placed">Placed</option>
+                              </>
+                            )}
+                          </select>
+                        ) : key === "amount" ? (
+                          <input
+                            type="number"
+                            value={app[key] || ""}
+                            onChange={(e) => handleUpdateStatus(app._id, key, e.target.value)}
+                            className="w-full px-2 py-1 border rounded"
+                            placeholder="Package"
+                          />
+                        ) : (
+                          app[key]
+                        )}
+                      </td>
+                    ))}
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <button
+                        onClick={() => openModal(app.proof.url)}
+                        className="text-blue-600 hover:text-blue-900"
+                      >
+                        <FaEye className="inline-block mr-1" /> View Proof
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        contentLabel="Proof Modal"
+        className="modal max-w-2xl mx-auto mt-20 bg-white p-6 rounded-lg shadow-xl"
+        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+      >
+        <button onClick={closeModal} className="absolute top-2 right-2 text-gray-600 hover:text-gray-800">
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        {proofUrl && <img src={proofUrl} alt="Proof" className="max-w-full h-auto" />}
+      </Modal>
+      <Modal
+        isOpen={emailModalIsOpen}
+        onRequestClose={() => setEmailModalIsOpen(false)}
+        contentLabel="Email Modal"
+        className="modal max-w-2xl mx-auto mt-20 bg-white p-6 rounded-lg shadow-xl"
+        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+      >
+        <h2 className="text-2xl font-bold mb-4">Compose Email</h2>
+        <div className="mb-4">
+          <label htmlFor="emailSubject" className="block text-sm font-medium text-gray-700 mb-1">Email Subject</label>
+          <input
+            id="emailSubject"
+            type="text"
+            value={emailSubject}
+            onChange={(e) => setEmailSubject(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div className="mb-4">
+          <label  htmlFor="emailContent" className="block text-sm font-medium text-gray-700 mb-1">Email Content</label>
+          <textarea
+            id="emailContent"
+            value={emailContent}
+            onChange={(e) => setEmailContent(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            rows="6"
+          ></textarea>
+        </div>
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold mb-2">Recipients:</h3>
+          <div className="max-h-40 overflow-y-auto border border-gray-300 rounded-md p-2">
+            {filteredApplications.map((app) => (
+              <div key={app._id} className="mb-1">
+                {app.fullName} ({app.email})
               </div>
-              <Modal
-                isOpen={modalIsOpen}
-                onRequestClose={closeModal}
-                contentLabel="Proof Modal"
-                className="modal"
-              >
-                <button className="close-modal" onClick={closeModal}>
-                  <AiFillCloseCircle />
-                </button>
-                {proofUrl && <img src={proofUrl} alt="Proof" />}
-              </Modal>
-              <Modal
-                isOpen={emailModalIsOpen}
-                onRequestClose={() => setEmailModalIsOpen(false)}
-                contentLabel="Email Modal"
-                className="modal"
-              >
-                <button
-                  className="close-modal"
-                  onClick={() => setEmailModalIsOpen(false)}
-                >
-                  <AiFillCloseCircle />
-                </button>
-                <h2>Email Content</h2>
-                <div>
-                  <label>Email Subject</label>
-                  <input
-                    type="text"
-                    value={emailSubject}
-                    onChange={(e) => setEmailSubject(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label>Email Content</label>
-                  <textarea
-                    value={emailContent}
-                    onChange={(e) => setEmailContent(e.target.value)}
-                  ></textarea>
-                </div>
-                <button onClick={handleSendEmails}>Send Emails</button>
-              </Modal>
-            </section>
-          }
-        />
-        <Route
-          path="/job-application/:reg"
-          element={<JobApplicationDetail />}
-        />
-      </Routes>
-    </>
+            ))}
+          </div>
+        </div>
+        <div className="flex justify-end space-x-2">
+          <button
+            onClick={() => setEmailModalIsOpen(false)}
+            className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition duration-200"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSendEmails}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200"
+          >
+            Send Emails
+          </button>
+        </div>
+      </Modal>
+    </div>
   );
 };
 
