@@ -7,7 +7,7 @@ import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 
 const JobApplicationDetail = () => {
-  const yy = "https://backend1-96bk.onrender.com";
+  const yy = "http://localhost:4000";
   const { reg } = useParams();
   const [jobApplication, setJobApplication] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);

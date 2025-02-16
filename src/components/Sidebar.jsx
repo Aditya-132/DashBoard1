@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { isAuthenticated, setIsAuthenticated } = useContext(Context);
-  const yy = "https://backend1-96bk.onrender.com";
+  const yy = "http://localhost:4000";
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -36,6 +36,7 @@ const Sidebar = () => {
     { icon: TiHome, label: "Home", onClick: () => navigateTo("/") },
     { icon: MdAddModerator, label: "Add New Admin", onClick: () => navigateTo("/admin/addnew") },
     { icon: FaPersonChalkboard, label: "Job Search", onClick: () => navigateTo("/admin/jobsearch") },
+    { icon: FaPersonChalkboard, label: "Elections", onClick: () => navigateTo("/admin/elections") },
     { icon: RiLogoutBoxFill, label: "Logout", onClick: handleLogout },
   ];
 

@@ -14,12 +14,13 @@ import JobApplicationDetail from "./components/JobApplicationDetail";
 import JobSearch from "./components/JobSearch";
 import CompanyDetailsCard from "./components/CompanyDetailsCard";
 import EditCompany from "./components/EditCompany";
+import Elections from "./components/Elections";
 
 
 const App = () => {
   const { isAuthenticated, setIsAuthenticated, admin, setAdmin } =
     useContext(Context);
-  const yy = "https://backend1-96bk.onrender.com";
+  const yy = "http://localhost:4000";
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -44,6 +45,7 @@ const App = () => {
         <Route path="/login" element={<Login />} />
 
         <Route path="/admin/addnew" element={<AddNewAdmin />} />
+        <Route path="/admin/elections" element={<Elections />} />
 
         <Route
           path="/job-application/:reg"

@@ -5,7 +5,7 @@ import { Context } from "../main";
 import { Eye, EyeOff, LogIn } from "lucide-react";
 
 const Login = () => {
-  const apiURL = "https://backend1-96bk.onrender.com";
+  const apiURL = "http://localhost:4000";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

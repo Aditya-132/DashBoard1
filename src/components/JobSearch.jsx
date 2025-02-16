@@ -10,7 +10,7 @@ import "./Dashboard.css";
 import { urls } from "../urls";
 
 const JobSearch = () => {
-  const yy = "https://backend1-96bk.onrender.com"; // Fixed URL by removing extra space
+  const yy = "http://localhost:4000"; // Fixed URL by removing extra space
 
   // State to store company data
   const [companies, setCompanies] = useState([]);

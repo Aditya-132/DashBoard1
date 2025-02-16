@@ -13,7 +13,7 @@ const CompanyDetailsCard = () => {
   const [company, setCompany] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const yy = "https://backend1-96bk.onrender.com"; // Base URL for API
+  const yy = "http://localhost:4000"; // Base URL for API
 
   const [isDeleting, setIsDeleting] = useState(false);
 
