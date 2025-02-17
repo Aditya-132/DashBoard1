@@ -37,6 +37,8 @@ const Sidebar = () => {
     { icon: MdAddModerator, label: "Add New Admin", onClick: () => navigateTo("/admin/addnew") },
     { icon: FaPersonChalkboard, label: "Job Search", onClick: () => navigateTo("/admin/jobsearch") },
     { icon: FaPersonChalkboard, label: "Elections", onClick: () => navigateTo("/admin/elections") },
+    {  icon: FaPersonChalkboard, label: "Docter", onClick: () => navigateTo("/admin/docter") },
+    {  icon: FaPersonChalkboard, label: "Facility", onClick: () => navigateTo("/admin/facility") },
     { icon: RiLogoutBoxFill, label: "Logout", onClick: handleLogout },
   ];
 

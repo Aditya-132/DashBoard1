@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
 
 const Elections = () => {
   const [candidates, setCandidates] = useState([]);
@@ -14,8 +13,9 @@ const Elections = () => {
   const fetchCandidates = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${yy}/api/v1/candidates`);
-      setCandidates(response.data.candidates);
+      const response = await fetch(`${yy}/api/v1/candidates`);
+      const data = await response.json();
+      setCandidates(data.candidates);
     } catch (error) {
       console.error("Error fetching candidates:", error);
     } finally {
@@ -25,10 +25,24 @@ const Elections = () => {
 
   const handleAddCandidate = async () => {
     if (!newCandidate.trim()) return;
+
+    const securityKey = prompt("Enter the security key:");
+    if (securityKey !== "DEANS123") {
+      alert("Invalid security key. Cannot add candidate.");
+      return;
+    }
+
     try {
       setLoading(true);
-      const response = await axios.post(`${yy}/api/v1/candidate`, { name: newCandidate });
-      setCandidates([...candidates, response.data.candidate]);
+      const response = await fetch(`${yy}/api/v1/candidate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name: newCandidate }),
+      });
+      const data = await response.json();
+      setCandidates([...candidates, data.candidate]);
       setNewCandidate("");
     } catch (error) {
       console.error("Error adding candidate:", error);
@@ -40,15 +54,16 @@ const Elections = () => {
   const handleRemoveCandidate = async (id) => {
     try {
       setLoading(true);
-      await axios.delete(`${yy}/api/v1/cc/${id}`); // Match this with the backend route
-      setCandidates(candidates.filter(candidate => candidate._id !== id));
+      await fetch(`${yy}/api/v1/cc/${id}`, {
+        method: "DELETE",
+      });
+      setCandidates(candidates.filter((candidate) => candidate._id !== id));
     } catch (error) {
       console.error("Error removing candidate:", error);
     } finally {
       setLoading(false);
     }
   };
-  
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
