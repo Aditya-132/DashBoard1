@@ -17,6 +17,9 @@ import EditCompany from "./components/EditCompany";
 import Elections from "./components/Elections";
 import Docter from "./components/Docter";
 import Facility from "./components/Facility";
+import TableAppl from "./components/TableAppl";
+import ComplaintManagement from "./components/Complaintable";
+import Cheaters from "./components/Cheating";
 
 
 const App = () => {
@@ -49,6 +52,8 @@ const App = () => {
         <Route path="/admin/addnew" element={<AddNewAdmin />} />
         <Route path="/admin/elections" element={<Elections />} />
         <Route path="/admin/docter" element={<Docter />} />
+        <Route path="/admin/comp" element={<ComplaintManagement />} />
+        <Route path="/admin/ches" element={<Cheaters />} />
 
         <Route
           path="/job-application/:reg"
@@ -58,6 +63,7 @@ const App = () => {
         <Route path="/edit-company/:id" element={<EditCompany />} />
         <Route path="/admin/jobsearch" element={<JobSearch />} />
         <Route path="/admin/facility" element={<Facility />} />
+        <Route path="/admin/appli" element={<TableAppl />} />
       </Routes>
 
       <ToastContainer position="top-center" />

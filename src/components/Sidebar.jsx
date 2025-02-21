@@ -39,6 +39,9 @@ const Sidebar = () => {
     { icon: FaPersonChalkboard, label: "Elections", onClick: () => navigateTo("/admin/elections") },
     {  icon: FaPersonChalkboard, label: "Docter", onClick: () => navigateTo("/admin/docter") },
     {  icon: FaPersonChalkboard, label: "Facility", onClick: () => navigateTo("/admin/facility") },
+    {  icon: FaPersonChalkboard, label: "Application", onClick: () => navigateTo("/admin/appli") },
+    {  icon: FaPersonChalkboard, label: "Complaint", onClick: () => navigateTo("/admin/comp") },
+    {  icon: FaPersonChalkboard, label: "Cheating", onClick: () => navigateTo("/admin/ches") },
     { icon: RiLogoutBoxFill, label: "Logout", onClick: handleLogout },
   ];
 
